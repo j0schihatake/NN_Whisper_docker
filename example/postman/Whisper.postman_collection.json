@@ -1,0 +1,63 @@
+{
+	"info": {
+		"_postman_id": "f89fdd62-ffb5-4339-980d-1f88434c5308",
+		"name": "Whisper",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "5674531"
+	},
+	"item": [
+		{
+			"name": "Speech_to_wav",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \r\n \"text\": \"Здравствуйте, я могу преобразовать текст в речь. Это потрясающе!\" \r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:3000/tts",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3000",
+					"path": [
+						"tts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Wav_to_speech",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:3000/transcribe",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3000",
+					"path": [
+						"transcribe"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
