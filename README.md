@@ -1,4 +1,4 @@
-# NN_whisper_docker
+# NN_Whisper_docker
 
 Ссылки:
 https://lablab.ai/t/whisper-api-flask-docker                      - с апи
