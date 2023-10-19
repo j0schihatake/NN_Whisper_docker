@@ -49,59 +49,58 @@ RUN apt-get update \
 RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
 
-# RUN service ssh start
-
 # Create user:
-RUN groupadd --gid 1020 whisper-group
+RUN groupadd --gid 1020 src-group
 RUN useradd -rm -d /home/whisper-user -s /bin/bash -G users,sudo,whisper-group -u 1000 whisper-user
+
+RUN python3 -m pip install torch torchvision torchaudio
+
+RUN python3 -m pip install flask
 
 # Update user password:
 RUN echo 'whisper-user:admin' | chpasswd
 
-RUN mkdir /home/whisper-user/whisper
+RUN mkdir /home/whisper-user/src
 
-RUN cd /home/whisper-user/whisper
+RUN cd /home/whisper-user/src
+
+#RUN pip3 install "git+https://github.com/openai/whisper.git" \
+
+# Установка Whisper:
+RUN pip3 install -U openai-src
+
+RUN pip3 install --upgrade --no-deps --force-reinstall git+https://github.com/openai/whisper.git
+
+#RUN apt-get install -y ffmpeg
+
+RUN pip3 install num2words
+
+RUN pip3 install pydub
+
+# ----------------------------- Rest-api:
 
 # Clone the repository
-RUN git clone https://github.com/askrella/speech-rest-api.git /home/whisper-user/whisper/
-
-# Navigate to the project directory
-#RUN cd speech-rest-api
-
-# Install ffmpeg (Ubuntu & Debian)
-#sudo apt update && sudo apt install ffmpeg -y
-
-RUN chmod 777 /home/whisper-user/whisper
-
-RUN cd /home/whisper-user/whisper
-
-# Install the dependencies
-RUN python3 -m pip install -r /home/whisper-user/whisper/requirements.txt
+#RUN git clone https://github.com/j0schihatake/speech-rest-api.git /home/src-user/src/ && \
+#    chmod 777 /home/src-user/src && \
+#    python3 -m pip install -r /home/src-user/src/requirements.txt
 
 # (Optional) Set PORT environment variable
-RUN export PORT=3000
+RUN export PORT=8084
 
-# Run the REST API
-# python app.py
+RUN chmod 777 /home/whisper-user/src
 
-COPY ./run.sh /home/whisper-user/whisper
-
-#ENTRYPOINT ["/home/whisper-user/whisper/run.sh"]
-
-# Download model
-# COPY ./model/wizardLM-7B.ggmlv3.q4_0.bin /home/whisper-user/model/      --> Так не отработало persmission denied
+ADD src/flask.py /home/whisper-user/whisper/
 
 # Preparing for login
 ENV HOME /home/whisper-user/whisper
 WORKDIR ${HOME}
 USER whisper-user
-CMD ["/bin/bash"]
-#CMD ["python", "llama_cpp.server --model /home/whisper-user/model/wizardLM-7B.ggmlv3.q4_0.bin"]
-
-#CMD["/bin/bash", "python3 -m llama_cpp.server --model /home/whisper-user/model/wizardLM-7B.ggmlv3.q4_0.bin"]
-
+#CMD python3 flask.py
+CMD python3 -m src.flask:app run --host=0.0.0.0
 
 # Docker:
 # docker build -t whisper .
-# docker run -it -dit --name whisper -p 3000:3000  --gpus all --restart unless-stopped whisper:latest
+# docker run -it -dit --name src -p 8084:8084  --gpus all --restart unless-stopped whisper:latest
+
+# Debug:
 # docker container attach whisper
