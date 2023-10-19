@@ -1,4 +1,4 @@
-# openAI_whisper_docker
+# NN_whisper_docker
 
 Ссылки:
 https://lablab.ai/t/whisper-api-flask-docker                      - с апи
@@ -9,3 +9,4 @@ https://github.com/sovse/base_rus_whisper_stt                     - дообуч
 
 Сборка из dockerHub для экономии времени:
 https://hub.docker.com/r/onerahmet/openai-whisper-asr-webservice
+https://github.com/openai/whisper
