@@ -1,6 +1,7 @@
 # Dockerfile to deploy a llama-cpp container with conda-ready environments
 
 # docker pull continuumio/miniconda3:latest
+# https://github.com/openai/whisper
 
 ARG TAG=latest
 FROM continuumio/miniconda3:$TAG
@@ -66,6 +67,10 @@ RUN pip3 install num2words
 
 RUN pip3 install pydub
 
+RUN pip3 install python-multipart
+
+RUN pip3 install ffmpeg-python
+
 # Update user password:
 RUN echo 'whisper-user:admin' | chpasswd
 
@@ -81,6 +86,7 @@ RUN pip3 install -U openai-whisper
 RUN pip3 install --upgrade --no-deps --force-reinstall git+https://github.com/openai/whisper.git
 
 ADD src/fast.py /home/whisper-user/whisper/src
+ADD src/tts.py /home/whisper-user/whisper/
 
 # Preparing for login
 RUN chmod 777 /home/whisper-user/whisper
