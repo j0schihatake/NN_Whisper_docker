@@ -55,7 +55,10 @@ RUN useradd -rm -d /home/whisper-user -s /bin/bash -G users,sudo,whisper-group -
 
 RUN python3 -m pip install torch torchvision torchaudio
 
-RUN python3 -m pip install flask
+# FastApi
+RUN python3 -m pip install pydantic uvicorn[standard] fastapi
+
+#RUN python3 -m pip install flask
 
 RUN pip3 install setuptools-rust
 
@@ -66,36 +69,30 @@ RUN pip3 install pydub
 # Update user password:
 RUN echo 'whisper-user:admin' | chpasswd
 
-RUN mkdir /home/whisper-user/src
+RUN mkdir /home/whisper-user/whisper
 
-RUN cd /home/whisper-user/src
+RUN mkdir /home/whisper-user/whisper/src
 
-#RUN pip3 install "git+https://github.com/openai/whisper.git" \
+RUN cd /home/whisper-user/whisper
 
 # Установка Whisper:
 RUN pip3 install -U openai-whisper
 
 RUN pip3 install --upgrade --no-deps --force-reinstall git+https://github.com/openai/whisper.git
 
-#RUN apt-get install -y ffmpeg
-
-# (Optional) Set PORT environment variable
-RUN export PORT=8084
-
-RUN chmod 777 /home/whisper-user/src
-
-ADD src/flask.py /home/whisper-user/whisper/
+ADD src/fast.py /home/whisper-user/whisper/src
 
 # Preparing for login
-ENV HOME /home/whisper-user/whisper
+RUN chmod 777 /home/whisper-user/whisper
+ENV HOME /home/whisper-user/whisper/
 WORKDIR ${HOME}
 USER whisper-user
-#CMD python3 flask.py
-CMD python3 -m src.flask:app run --host=0.0.0.0
+
+CMD uvicorn src.fast:app --host 0.0.0.0 --port 8084 --reload
 
 # Docker:
 # docker build -t whisper .
-# docker run -it -dit --name src -p 8084:8084  --gpus all --restart unless-stopped whisper:latest
+# docker run -it -dit --name whisper -p 8084:8084 --gpus all --restart unless-stopped whisper:latest
 
 # Debug:
 # docker container attach whisper
