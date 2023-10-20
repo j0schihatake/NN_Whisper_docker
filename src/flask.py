@@ -11,7 +11,6 @@ import tempfile
 import uuid
 
 # Check if NVIDIA GPU is available
-torch.cuda.is_available()
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 # Load the Whisper model
@@ -192,7 +191,7 @@ def clean():
 
 # Entry point
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
+    port = int(os.environ.get('PORT', 8084))
 
     # Start server
     print("[Speech REST API] Starting server on port " + str(port))

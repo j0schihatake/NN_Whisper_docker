@@ -50,12 +50,18 @@ RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
 
 # Create user:
-RUN groupadd --gid 1020 src-group
+RUN groupadd --gid 1020 whisper-group
 RUN useradd -rm -d /home/whisper-user -s /bin/bash -G users,sudo,whisper-group -u 1000 whisper-user
 
 RUN python3 -m pip install torch torchvision torchaudio
 
 RUN python3 -m pip install flask
+
+RUN pip3 install setuptools-rust
+
+RUN pip3 install num2words
+
+RUN pip3 install pydub
 
 # Update user password:
 RUN echo 'whisper-user:admin' | chpasswd
@@ -67,22 +73,11 @@ RUN cd /home/whisper-user/src
 #RUN pip3 install "git+https://github.com/openai/whisper.git" \
 
 # Установка Whisper:
-RUN pip3 install -U openai-src
+RUN pip3 install -U openai-whisper
 
 RUN pip3 install --upgrade --no-deps --force-reinstall git+https://github.com/openai/whisper.git
 
 #RUN apt-get install -y ffmpeg
-
-RUN pip3 install num2words
-
-RUN pip3 install pydub
-
-# ----------------------------- Rest-api:
-
-# Clone the repository
-#RUN git clone https://github.com/j0schihatake/speech-rest-api.git /home/src-user/src/ && \
-#    chmod 777 /home/src-user/src && \
-#    python3 -m pip install -r /home/src-user/src/requirements.txt
 
 # (Optional) Set PORT environment variable
 RUN export PORT=8084
