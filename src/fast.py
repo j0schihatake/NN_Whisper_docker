@@ -1,6 +1,6 @@
 from fastapi import FastAPI, File, UploadFile, Response
 from pydantic import BaseModel
-from stt import transcribe
+from whisper import transcribe
 
 
 app = FastAPI()
