@@ -57,9 +57,9 @@ RUN useradd -rm -d /home/whisper-user -s /bin/bash -G users,sudo,whisper-group -
 RUN python3 -m pip install torch torchvision torchaudio
 
 # FastApi
-RUN python3 -m pip install pydantic uvicorn[standard] fastapi
+#RUN python3 -m pip install pydantic uvicorn[standard] fastapi
 
-#RUN python3 -m pip install flask
+RUN python3 -m pip install flask
 
 RUN pip3 install setuptools-rust
 
@@ -85,8 +85,9 @@ RUN pip3 install -U openai-whisper
 
 RUN pip3 install --upgrade --no-deps --force-reinstall git+https://github.com/openai/whisper.git
 
-ADD src/fast.py /home/whisper-user/whisper/src
-ADD src/tts.py /home/whisper-user/whisper/
+ADD app.py /home/whisper-user/whisper/
+#ADD src/fast.py /home/whisper-user/whisper/src
+#ADD src/tts.py /home/whisper-user/whisper/
 
 # Preparing for login
 RUN chmod 777 /home/whisper-user/whisper
@@ -94,7 +95,18 @@ ENV HOME /home/whisper-user/whisper/
 WORKDIR ${HOME}
 USER whisper-user
 
-CMD uvicorn src.fast:app --host 0.0.0.0 --port 8084 --reload
+#   --------------------------  AstAPI:
+
+#CMD uvicorn src.fast:app --host 0.0.0.0 --port 8084 --reload
+
+#   --------------------------  FLASK:
+
+# (Optional) Set PORT environment variable
+RUN export PORT=8084
+RUN export FLASK_RUN_HOST=0.0.0.0
+RUN export FLASK_RUN_PORT=8084
+CMD python3 -m app run --host=0.0.0.0
+#CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]
 
 # Docker:
 # docker build -t whisper .

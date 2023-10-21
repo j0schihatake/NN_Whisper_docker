@@ -1,33 +1,30 @@
+from urllib import request
+
 from fastapi import FastAPI, File, UploadFile, Response
 from tempfile import NamedTemporaryFile
 from num2words import num2words
 from pydub import AudioSegment
 from pydantic import BaseModel
-import whisper
-import os
-import re
-import tempfile
-import uuid
 import io
 import json
 import ffmpeg
 import numpy as np
 import torch
-
-
-class TranscribeRequest(BaseModel):
-    audio: bytes
-
+import whisper
+import torch
+from num2words import num2words
+from pydub import AudioSegment
+import torchaudio
+import os
+import re
+import tempfile
+import uuid
 
 # Check if NVIDIA GPU is available
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
-print("Start load large model")
-
 # Load the Whisper model
 model = whisper.load_model("large", device=DEVICE)
-
-print("Model loaded")
 
 # TTS file prefix
 speech_tts_prefix = "speech-tts-"
@@ -35,14 +32,13 @@ wav_suffix = ".wav"
 opus_suffix = ".opus"
 
 
-async def transcribes(request: TranscribeRequest):
-
-    audio = load_audio(request.audio)
-    result = model.transcribe(audio)
-
-    text = result["text"]
-    print("Transcribe text: " + text)
-    return text
+# Clean temporary files (called every 5 minutes)
+def clean_tmp():
+    tmp_dir = tempfile.gettempdir()
+    for file in os.listdir(tmp_dir):
+        if file.startswith(speech_tts_prefix):
+            os.remove(os.path.join(tmp_dir, file))
+    print("[Speech REST API] Temporary files cleaned!")
 
 
 # Preprocess text to replace numerals with words
@@ -51,53 +47,50 @@ def preprocess_text(text):
     return text
 
 
-# Preprocess decade and auto detect language
-def decode_and_autodetect_language(audio_bytes):
-    # model = whisper.load_model("base")
+# Run TTS and save file
+# Returns the path to the file
+def run_tts_and_save_file(text):
+    # Running the TTS
+    mel_outputs, mel_length, alignment = model.encode_batch([text])
 
-    # load audio and pad/trim it to fit 30 seconds
-    audio = whisper.load_audio("audio.mp3")
-    audio = whisper.pad_or_trim(audio)
+    # Running Vocoder (spectrogram-to-waveform)
+    # Assuming HIFIGAN is used as the vocoder in Whisper
+    # You can adjust this part based on the actual vocoder used in your Whisper model
+    hifi_gan = model.hifigan
+    waveforms = hifi_gan.decode_batch(mel_outputs)
 
-    # make log-Mel spectrogram and move to the same device as the model
-    mel = whisper.log_mel_spectrogram(audio).to(model.device)
+    # Get temporary directory
+    tmp_dir = tempfile.gettempdir()
 
-    # detect the spoken language
-    _, probs = model.detect_language(mel)
-    print(f"Detected language: {max(probs, key=probs.get)}")
-
-    # decode the audio
-    options = whisper.DecodingOptions()
-    result = whisper.decode(model, mel, options)
-
-    # print the recognized text
-    print(result.text)
-    return result.text
+    # Save wav to temporary file
+    tmp_path_wav = os.path.join(tmp_dir, speech_tts_prefix + str(uuid.uuid4()) + wav_suffix)
+    torchaudio.save(tmp_path_wav, waveforms.squeeze(1), 22050)
+    return tmp_path_wav
 
 
-def load_audio(file_bytes: bytes, sr: int = 16_000) -> np.ndarray:
-    """
-    Use file's bytes and transform to mono waveform, resampling as necessary
-    Parameters
-    ----------
-    file: bytes
-        The bytes of the audio file
-    sr: int
-        The sample rate to resample the audio if necessary
-    Returns
-    -------
-    A NumPy array containing the audio waveform, in float32 dtype.
-    """
-    try:
-        # This launches a subprocess to decode audio while down-mixing and resampling as necessary.
-        # Requires the ffmpeg CLI and `ffmpeg-python` package to be installed.
-        out, _ = (
-            ffmpeg.input('pipe:', threads=0)
-            .output("pipe:", format="s16le", acodec="pcm_s16le", ac=1, ar=sr)
-            .run_async(pipe_stdin=True, pipe_stdout=True)
-        ).communicate(input=file_bytes)
+def transcribe_from_multipart_file():
+    if not request.files:
+        # If the user didn't submit any files, return a 400 (Bad Request) error.
+        os.abort(400)
 
-    except ffmpeg.Error as e:
-        raise RuntimeError(f"Failed to load audio: {e.stderr.decode()}") from e
+    # For each file, let's store the results in a list of dictionaries.
+    results = []
 
-    return np.frombuffer(out, np.int16).flatten().astype(np.float32) / 32768.0
+    # Loop over every file that the user submitted.
+    for filename, handle in request.files.items():
+        # Create a temporary file.
+        # The location of the temporary file is available in `temp.name`.
+        temp = NamedTemporaryFile()
+        # Write the user's uploaded file to the temporary file.
+        # The file will get deleted when it drops out of scope.
+        handle.save(temp)
+        # Let's get the transcript of the temporary file.
+        result = model.transcribe(temp.name)
+        # Now we can store the result object for this file.
+        results.append({
+            'filename': filename,
+            'transcript': result['text'],
+        })
+
+    # This will be automatically converted to JSON.
+    return {'results': results}
