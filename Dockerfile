@@ -15,8 +15,6 @@ RUN apt-get update \
         sudo \
         build-essential \
         dpkg-dev \
-        wget \
-        openssh-server \
         ca-certificates \
         netbase\
         tzdata \
