@@ -9,6 +9,8 @@ FROM continuumio/miniconda3:$TAG
 RUN apt-get update \
     && DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends \
         git \
+        uvicorn \
+        libportaudio2 \
         locales \
         sudo \
         build-essential \
@@ -24,7 +26,6 @@ RUN apt-get update \
         python3-tk \
         pip \
         bash \
-        git \
         ncdu \
         net-tools \
         openssh-server \
@@ -76,6 +77,8 @@ RUN echo 'whisper-user:admin' | chpasswd
 
 RUN mkdir /home/whisper-user/whisper
 
+RUN mkdir /home/whisper-user/whisper/temp
+
 RUN mkdir /home/whisper-user/whisper/src
 
 RUN cd /home/whisper-user/whisper
@@ -95,7 +98,7 @@ ENV HOME /home/whisper-user/whisper/
 WORKDIR ${HOME}
 USER whisper-user
 
-#   --------------------------  AstAPI:
+#   --------------------------  FastAPI:
 
 #CMD uvicorn src.fast:app --host 0.0.0.0 --port 8084 --reload
 
@@ -111,6 +114,7 @@ CMD python3 -m app run --host=0.0.0.0
 # Docker:
 # docker build -t whisper .
 # docker run -it -dit --name whisper -p 8084:8084 --gpus all --restart unless-stopped whisper:latest
+# docker run -it -dit --name whisper -p 8084:8084 -v D:/Develop/NeuronNetwork/llama_cpp/llama_cpp_java/model/:/home/whisper-user/whisper/temp --gpus all --restart unless-stopped whisper:latest
 
 # Debug:
 # docker container attach whisper
