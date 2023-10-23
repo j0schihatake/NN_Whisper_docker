@@ -81,6 +81,10 @@ RUN mkdir /home/whisper-user/whisper/src
 
 RUN cd /home/whisper-user/whisper
 
+# Установка Faster-Whisper
+RUN pip3 install faster-whisper
+# pip install --force-reinstall "faster-whisper @ https://github.com/guillaumekln/faster-whisper/archive/refs/heads/master.tar.gz"
+
 # Установка Whisper:
 RUN pip3 install -U openai-whisper
 

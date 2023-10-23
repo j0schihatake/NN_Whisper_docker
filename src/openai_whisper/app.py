@@ -35,7 +35,7 @@ print("model loaded.")
 
 temp_audio: str = "/home/whisper-user/whisper/temp/input.wav"
 
-app = Flask(__name__)
+#app = Flask(__name__)
 
 
 @app.route("/")
@@ -56,7 +56,7 @@ def handler():
         temp = temp_audio
         handle.save(temp)
         # Let's get the transcript of the temporary file.
-        result = model.transcribe(temp)
+        result = model.transcribe(temp.name)
         # Now we can store the result object for this file.
         results.append({
             'filename': filename,
@@ -78,9 +78,9 @@ def silent_remove(filename):
 
 
 # Entry point
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 8084))
+#if __name__ == '__main__':
+#    port = int(os.environ.get('PORT', 8084))
     
-    print("[Whisper STT] Starting server on port " + str(port))
+#    print("[Whisper STT] Starting server on port " + str(port))
 
-    app.run(host='0.0.0.0', port=port)
+#    app.run(host='0.0.0.0', port=port)
