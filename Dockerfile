@@ -116,6 +116,7 @@ CMD python3 -m app run --host=0.0.0.0
 # Docker:
 # docker build -t whisper .
 # docker run -it -dit --name whisper -p 8084:8084 -v D:/Develop/NeuronNetwork/Whisper/NN_Whisper_docker/NN_Whisper_docker/temp/:/home/whisper-user/whisper/temp --gpus all --restart unless-stopped whisper:latest
+# docker run -it -dit --name whisper -p 8084:8084 -v D:/Develop/NeuronNetwork/Whisper/NN_Whisper_docker/NN_Whisper_docker/temp/:/home/whisper-user/whisper/temp --restart unless-stopped whisper:latest
 
 # Debug:
 # docker container attach whisper
