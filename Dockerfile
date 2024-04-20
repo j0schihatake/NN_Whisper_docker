@@ -118,5 +118,8 @@ CMD python3 -m app run --host=0.0.0.0
 # docker run -it -dit --name whisper -p 8084:8084 -v D:/Develop/NeuronNetwork/Whisper/NN_Whisper_docker/NN_Whisper_docker/temp/:/home/whisper-user/whisper/temp --gpus all --restart unless-stopped whisper:latest
 # docker run -it -dit --name whisper -p 8084:8084 -v D:/Develop/NeuronNetwork/Whisper/NN_Whisper_docker/NN_Whisper_docker/temp/:/home/whisper-user/whisper/temp --restart unless-stopped whisper:latest
 
+# Запуск на сервере:
+# docker run -it -dit --network=sai-network --name whisper -p 8084:8084 -v /root/work/whisper_docker/NN_Whisper_docker/:/home/whisper-user/whisper/temp --restart unless-stopped whisper:latest
+
 # Debug:
 # docker container attach whisper
