@@ -123,3 +123,7 @@ CMD python3 -m app run --host=0.0.0.0
 
 # Debug:
 # docker container attach whisper
+
+# docker ps
+# docker export 768fde233321cdfa6399c308052d1f3d6d54a1f27407711a27b8437bdcc2cae8 -o D:/whisper.tar
+# docker import D:/whisper.tar whisper
