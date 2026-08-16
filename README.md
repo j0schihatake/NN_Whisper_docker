@@ -21,6 +21,16 @@ docker run -d --name whisper \
 6-7 ГБ) — проверено, что при лимите памяти Docker Desktop VM ниже этого контейнер убивается по
 OOM ещё на этапе `torch.load`, независимо от того, откуда докачивается сама модель.
 
+Если этот репозиторий выложен рядом с `javader_java` (как `modules/NN_Whisper_docker`), поднимать
+вручную командами выше не обязательно — он уже заведён как сервис `whisper` в едином
+`javader/compose.yaml` (`chown`-шаг оттуда тоже уже сделан за вас через `whisper-cache-init`).
+Том там объявлен как `external` — на совсем свежей машине его нужно создать один раз
+(`docker volume create whisper-model-cache`), Compose сам внешний том не создаёт:
+
+```
+docker compose -p javader -f javader/compose.yaml up -d whisper
+```
+
 Ссылки:
 
 https://lablab.ai/t/whisper-api-flask-docker                      - с апи
