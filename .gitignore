@@ -25,3 +25,8 @@ replay_pid*
 .idea/
 target/
 .mvn/
+
+# Python
+__pycache__/
+*.pyc
+.venv/

@@ -19,7 +19,6 @@ RUN apt-get update \
         netbase\
         tzdata \
         nano \
-        software-properties-common \
         python3-venv \
         python3-tk \
         pip \
@@ -75,8 +74,6 @@ RUN echo 'whisper-user:admin' | chpasswd
 
 RUN mkdir /home/whisper-user/whisper
 
-RUN mkdir /home/whisper-user/whisper/temp
-
 RUN mkdir /home/whisper-user/whisper/src
 
 RUN cd /home/whisper-user/whisper
@@ -96,7 +93,7 @@ ADD app.py /home/whisper-user/whisper/
 
 # Preparing for login
 RUN chmod 777 /home/whisper-user/whisper
-ENV HOME /home/whisper-user/whisper/
+ENV HOME=/home/whisper-user/whisper/
 WORKDIR ${HOME}
 USER whisper-user
 
@@ -106,20 +103,22 @@ USER whisper-user
 
 #   --------------------------  FLASK:
 
-# (Optional) Set PORT environment variable
-RUN export PORT=8084
-RUN export FLASK_RUN_HOST=0.0.0.0
-RUN export FLASK_RUN_PORT=8084
-CMD python3 -m app run --host=0.0.0.0
-#CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]
+ENV PORT=8084
+ENV FLASK_RUN_HOST=0.0.0.0
+ENV FLASK_RUN_PORT=8084
+
+HEALTHCHECK --interval=10s --timeout=3s --start-period=30s --retries=5 \
+    CMD curl -f http://127.0.0.1:8084/ || exit 1
+
+CMD ["python3", "app.py"]
 
 # Docker:
 # docker build -t whisper .
-# docker run -it -dit --name whisper -p 8084:8084 -v D:/Develop/NeuronNetwork/Whisper/NN_Whisper_docker/NN_Whisper_docker/temp/:/home/whisper-user/whisper/temp --gpus all --restart unless-stopped whisper:latest
-# docker run -it -dit --name whisper -p 8084:8084 -v D:/Develop/NeuronNetwork/Whisper/NN_Whisper_docker/NN_Whisper_docker/temp/:/home/whisper-user/whisper/temp --restart unless-stopped whisper:latest
+# docker run -it -dit --name whisper -p 8084:8084 --gpus all --restart unless-stopped whisper:latest
+# docker run -it -dit --name whisper -p 8084:8084 --restart unless-stopped whisper:latest
 
 # Запуск на сервере:
-# docker run -it -dit --network=sai-network --name whisper -p 8084:8084 -v /root/work/whisper_docker/NN_Whisper_docker/:/home/whisper-user/whisper/temp --restart unless-stopped whisper:latest
+# docker run -it -dit --network=sai-network --name whisper -p 8084:8084 --restart unless-stopped whisper:latest
 
 # Debug:
 # docker container attach whisper
