@@ -12,7 +12,7 @@ docker build -t whisper:local .
 docker run --rm -v whisper-model-cache:/cache alpine:latest chown -R 1000:1000 /cache
 
 docker run -d --name whisper \
-  -p 8084:8084 \
+  -p 28084:28084 \
   -v whisper-model-cache:/home/whisper-user/whisper/.cache/whisper \
   whisper:local
 ```
@@ -39,8 +39,8 @@ https://github.com/openai/whisper
 
 Как протестировать API?
 
-Вы можете протестировать API, отправив POST-запрос на маршрут http://localhost:8084/whisper с файлом в нем. Тело должно быть form-data.
+Вы можете протестировать API, отправив POST-запрос на маршрут http://localhost:28084/whisper с файлом в нем. Тело должно быть form-data.
 
 Вы можете использовать следующую команду curl для тестирования API:
 
-curl -F "file=@D:/Develop/NeuronNetwork/Whisper/docker_mi/NN_whisper_docker/whisper/example/nana-in-my-dreams.wav" http://localhost:8084/whisper
+curl -F "file=@D:/Develop/NeuronNetwork/Whisper/docker_mi/NN_whisper_docker/whisper/example/nana-in-my-dreams.wav" http://localhost:28084/whisper

@@ -84,7 +84,7 @@ def silent_remove(filename):
 
 # Entry point
 #if __name__ == '__main__':
-#    port = int(os.environ.get('PORT', 8084))
+#    port = int(os.environ.get('PORT', 28084))
 
 #    print("[Whisper STT] Starting server on port " + str(port))
 

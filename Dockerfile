@@ -99,26 +99,26 @@ USER whisper-user
 
 #   --------------------------  FastAPI:
 
-#CMD uvicorn src.fast:app --host 0.0.0.0 --port 8084 --reload
+#CMD uvicorn src.fast:app --host 0.0.0.0 --port 28084 --reload
 
 #   --------------------------  FLASK:
 
-ENV PORT=8084
+ENV PORT=28084
 ENV FLASK_RUN_HOST=0.0.0.0
-ENV FLASK_RUN_PORT=8084
+ENV FLASK_RUN_PORT=28084
 
 HEALTHCHECK --interval=10s --timeout=3s --start-period=30s --retries=5 \
-    CMD curl -f http://127.0.0.1:8084/ || exit 1
+    CMD curl -f http://127.0.0.1:28084/ || exit 1
 
 CMD ["python3", "app.py"]
 
 # Docker:
 # docker build -t whisper .
-# docker run -it -dit --name whisper -p 8084:8084 --gpus all --restart unless-stopped whisper:latest
-# docker run -it -dit --name whisper -p 8084:8084 --restart unless-stopped whisper:latest
+# docker run -it -dit --name whisper -p 28084:28084 --gpus all --restart unless-stopped whisper:latest
+# docker run -it -dit --name whisper -p 28084:28084 --restart unless-stopped whisper:latest
 
 # Запуск на сервере:
-# docker run -it -dit --network=sai-network --name whisper -p 8084:8084 --restart unless-stopped whisper:latest
+# docker run -it -dit --network=sai-network --name whisper -p 28084:28084 --restart unless-stopped whisper:latest
 
 # Debug:
 # docker container attach whisper
